@@ -2,37 +2,38 @@ import React, { Component } from 'react';
 import Controls from '../components/controls/Controls';
 import Face from '../components/face/Face';
 
-const actions = [
-  { name: 'DRINK_COFFEE', text: 'Drink Coffee', stateName: 'coffees' },
-  { name: 'EAT_SNACK', text: 'Snack', stateName: 'snacks' },
-  { name: 'TAKE_NAP', text: 'Nap', stateName: 'naps' },
-  { name: 'STUDY', text: 'Study', stateName: 'studies' },
-];
+import getMood from '../components/selector/moodSelector';
 
-export const isTired = state => state.coffees < 1 && state.naps < 1;
-export const isHyper = state => state.coffees > 3;
-export const isEducated = state => state.studies > 2;
-export const isHungry = state => state.snacks < 1;
+import {
+  actions,
+  isTired,
+  isHyper,
+  isHungry,
+  isEducated,
+} from '../actions/moodActions'
 
-export const getFace = state => {
-  if(isTired(state) && isHungry(state)) return '😠';
-  if(isHyper(state) && isHungry(state)) return '🤮';
-  if(isTired(state)) return '😴';
-  if(isHyper(state)) return '🙀';
-  if(isEducated(state)) return '😲';
-  if(isHungry(state)) return '😡';
+export default function getFace(state, action) {
+  switch(action.type) {
+    case (isTired && isHungry):
+      return {...state, '😠'}
+      case (isHyper && isHungry):
+        return '🤮'
+      case isTired: 
+        return (...state,'😴') => {
+          case isHyper:
+             return '🙀'
 
-  return '😀';
+        }
+      case isEducated:
+         return '😲'
+      case isHungry:
+         return '😡';
+      default:
+        return '😀';
+  }
 };
 
-export default class Moods extends Component {
-  state = {
-    coffees: 0,
-    snacks: 0,
-    naps: 0,
-    studies: 0
-  }
-
+export default function Moods (state = { coffees: 0, snacks: 0, naps: 0, studies: 0 }, action) {
   handleSelection = name => {
     switch(name) {
       case 'DRINK_COFFEE':
@@ -51,6 +52,7 @@ export default class Moods extends Component {
         console.log(`unhandled name: ${name}`);
     }
   }
+}
 
   render() {
     const face = getFace(this.state);
@@ -66,4 +68,3 @@ export default class Moods extends Component {
       </>
     );
   }
-}
